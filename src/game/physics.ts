@@ -1,4 +1,4 @@
-import { GRAVITY, TIER_STATS } from './constants';
+import { GRAVITY } from './constants';
 
 export type PlatformType = 'BASIC' | 'SPRING' | 'CRACKED';
 export type ItemType = 'HELICOPTER' | 'COIN' | 'MAGNET';

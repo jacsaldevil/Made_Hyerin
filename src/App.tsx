@@ -1,7 +1,6 @@
 import './App.css'
 import GameCanvas from './components/GameCanvas'
 import { useGameStore } from './store/useGameStore'
-import { TIER_STATS } from './game/constants'
 
 const CHARACTERS = [
   { tier: 0, name: 'Rabbit', price: 0, emoji: '🐰', desc: 'Default stats' },
@@ -13,7 +12,8 @@ const CHARACTERS = [
 function App() {
   const { 
     gameState, setGameState, score, highScore, coins, 
-    characterTier, setCharacterTier, ownedTiers, buyCharacter 
+    characterTier, setCharacterTier, ownedTiers, buyCharacter,
+    setMobileMove
   } = useGameStore();
 
   const handleCharacterAction = (char: typeof CHARACTERS[0]) => {
@@ -69,7 +69,7 @@ function App() {
           <div className="menu">
             <h1>Paused</h1>
             <button onClick={() => setGameState('PLAYING')}>Resume</button>
-            <button onClick={() => window.location.reload()}>Main Menu</button>
+            <button onClick={() => setGameState('START')}>Main Menu</button>
           </div>
         )}
 
@@ -79,6 +79,29 @@ function App() {
             <p>Score: {score}</p>
             <button onClick={() => setGameState('PLAYING')}>Retry</button>
             <button onClick={() => setGameState('START')}>Main Menu</button>
+          </div>
+        )}
+
+        {gameState === 'PLAYING' && (
+          <div className="mobile-controls">
+            <button 
+              className="control-btn left"
+              onMouseDown={() => setMobileMove('LEFT')}
+              onMouseUp={() => setMobileMove(null)}
+              onTouchStart={(e) => { e.preventDefault(); setMobileMove('LEFT'); }}
+              onTouchEnd={(e) => { e.preventDefault(); setMobileMove(null); }}
+            >◀</button>
+            <button 
+              className="control-btn pause-small"
+              onClick={() => setGameState('PAUSED')}
+            >⏸</button>
+            <button 
+              className="control-btn right"
+              onMouseDown={() => setMobileMove('RIGHT')}
+              onMouseUp={() => setMobileMove(null)}
+              onTouchStart={(e) => { e.preventDefault(); setMobileMove('RIGHT'); }}
+              onTouchEnd={(e) => { e.preventDefault(); setMobileMove(null); }}
+            >▶</button>
           </div>
         )}
       </div>
