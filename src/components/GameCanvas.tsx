@@ -300,7 +300,6 @@ const GameCanvas: React.FC = () => {
       ref={canvasRef}
       width={CANVAS_WIDTH}
       height={CANVAS_HEIGHT}
-      style={{ border: '4px solid #222', borderRadius: '8px', boxShadow: '0 0 20px rgba(0,0,0,0.5)' }}
     />
   );
 };

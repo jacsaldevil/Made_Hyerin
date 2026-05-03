@@ -29,7 +29,7 @@ function App() {
   };
 
   return (
-    <div className="game-container">
+    <div className="game-container" onContextMenu={(e) => e.preventDefault()}>
       <div className="ui-overlay">
         <div className="stats-bar">
           <div className="stat-item">Score: {score}</div>
@@ -53,7 +53,6 @@ function App() {
                     <div className="char-emoji-preview">{char.emoji}</div>
                     <div className="char-info">
                       <span className="char-name">{char.name}</span>
-                      <span className="char-desc">{char.desc}</span>
                       {!ownedTiers.includes(char.tier) && <span className="char-price">💰 {char.price}</span>}
                     </div>
                   </div>
@@ -68,8 +67,8 @@ function App() {
         {gameState === 'PAUSED' && (
           <div className="menu">
             <h1>Paused</h1>
-            <button onClick={() => setGameState('PLAYING')}>Resume</button>
-            <button onClick={() => setGameState('START')}>Main Menu</button>
+            <button className="start-btn" onClick={() => setGameState('PLAYING')}>Resume</button>
+            <button className="start-btn" style={{background: '#666', marginTop: '10px'}} onClick={() => setGameState('START')}>Main Menu</button>
           </div>
         )}
 
@@ -77,17 +76,18 @@ function App() {
           <div className="menu">
             <h1>Mission Failed</h1>
             <p>Score: {score}</p>
-            <button onClick={() => setGameState('PLAYING')}>Retry</button>
-            <button onClick={() => setGameState('START')}>Main Menu</button>
+            <button className="start-btn" onClick={() => setGameState('PLAYING')}>Retry</button>
+            <button className="start-btn" style={{background: '#666', marginTop: '10px'}} onClick={() => setGameState('START')}>Main Menu</button>
           </div>
         )}
 
         {gameState === 'PLAYING' && (
           <div className="mobile-controls">
             <button 
-              className="control-btn left"
+              className="control-btn"
               onMouseDown={() => setMobileMove('LEFT')}
               onMouseUp={() => setMobileMove(null)}
+              onMouseLeave={() => setMobileMove(null)}
               onTouchStart={(e) => { e.preventDefault(); setMobileMove('LEFT'); }}
               onTouchEnd={(e) => { e.preventDefault(); setMobileMove(null); }}
             >◀</button>
@@ -96,9 +96,10 @@ function App() {
               onClick={() => setGameState('PAUSED')}
             >⏸</button>
             <button 
-              className="control-btn right"
+              className="control-btn"
               onMouseDown={() => setMobileMove('RIGHT')}
               onMouseUp={() => setMobileMove(null)}
+              onMouseLeave={() => setMobileMove(null)}
               onTouchStart={(e) => { e.preventDefault(); setMobileMove('RIGHT'); }}
               onTouchEnd={(e) => { e.preventDefault(); setMobileMove(null); }}
             >▶</button>
@@ -107,10 +108,6 @@ function App() {
       </div>
       
       <GameCanvas />
-      
-      <div className="controls-hint">
-        <p>Arrows: Move | Esc: Pause | (Auto Jump on Platforms)</p>
-      </div>
     </div>
   )
 }
