@@ -8,11 +8,13 @@ interface GameState {
   gameState: 'START' | 'PLAYING' | 'PAUSED' | 'GAMEOVER';
   characterTier: 0 | 1 | 2 | 3;
   ownedTiers: number[];
+  mobileMove: 'LEFT' | 'RIGHT' | null;
   
   setScore: (score: number) => void;
   addCoins: (amount: number) => void;
   setGameState: (state: 'START' | 'PLAYING' | 'PAUSED' | 'GAMEOVER') => void;
   setCharacterTier: (tier: 0 | 1 | 2 | 3) => void;
+  setMobileMove: (move: 'LEFT' | 'RIGHT' | null) => void;
   buyCharacter: (tier: number, price: number) => boolean;
   resetGame: () => void;
 }
@@ -26,6 +28,7 @@ export const useGameStore = create<GameState>()(
       gameState: 'START',
       characterTier: 0,
       ownedTiers: [0],
+      mobileMove: null,
 
       setScore: (score) => set((state) => ({ 
         score, 
@@ -37,6 +40,8 @@ export const useGameStore = create<GameState>()(
       setGameState: (gameState) => set({ gameState }),
       
       setCharacterTier: (characterTier) => set({ characterTier }),
+
+      setMobileMove: (mobileMove) => set({ mobileMove }),
 
       buyCharacter: (tier, price) => {
         const { coins, ownedTiers } = get();
