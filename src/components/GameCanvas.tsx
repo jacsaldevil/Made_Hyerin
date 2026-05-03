@@ -13,7 +13,7 @@ const CHAR_EMOJIS = {
 
 const GameCanvas: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { gameState, setScore, addCoins, characterTier, setGameState } = useGameStore();
+  const { gameState, setScore, addCoins, characterTier, setGameState, mobileMove } = useGameStore();
   
   const player = useRef<Player>({
     x: CANVAS_WIDTH / 2 - 15,
@@ -130,10 +130,10 @@ const GameCanvas: React.FC = () => {
 
     const render = (time: number) => {
       if (gameState === 'PLAYING') {
-        // Smooth horizontal movement using key state
+        // Smooth horizontal movement using key state or mobile touch
         const speed = TIER_STATS[characterTier].speed;
-        if (keys.current['ArrowLeft']) player.current.vx = -speed;
-        else if (keys.current['ArrowRight']) player.current.vx = speed;
+        if (keys.current['ArrowLeft'] || mobileMove === 'LEFT') player.current.vx = -speed;
+        else if (keys.current['ArrowRight'] || mobileMove === 'RIGHT') player.current.vx = speed;
         else player.current.vx = 0;
 
         player.current.activePowerUps = player.current.activePowerUps.filter(p => time < p.endTime);
