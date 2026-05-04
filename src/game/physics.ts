@@ -33,19 +33,19 @@ export interface Item extends Entity {
   collected: boolean;
 }
 
-export const updatePlayerPhysics = (player: Player) => {
-  player.vy += GRAVITY;
-  player.y += player.vy;
-  player.x += player.vx;
+export const updatePlayerPhysics = (player: Player, dt: number = 1) => {
+  player.vy += GRAVITY * dt;
+  player.y += player.vy * dt;
+  player.x += player.vx * dt;
 
   // Screen wrap
   if (player.x + player.width < 0) player.x = 400;
   if (player.x > 400) player.x = -player.width;
 };
 
-export const updatePlatformPhysics = (platform: Platform) => {
+export const updatePlatformPhysics = (platform: Platform, dt: number = 1) => {
   if (platform.isMoving) {
-    platform.x += platform.moveDirection * 2;
+    platform.x += platform.moveDirection * 2 * dt;
     if (platform.x <= 0 || platform.x + platform.width >= 400) {
       platform.moveDirection *= -1;
     }

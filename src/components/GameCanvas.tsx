@@ -13,7 +13,7 @@ const CHAR_EMOJIS = {
 
 const GameCanvas: React.FC = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { gameState, setScore, addCoins, characterTier, setGameState, mobileMove } = useGameStore();
+  const { gameState, setScore, addCoins, characterTier, setGameState } = useGameStore();
   
   const player = useRef<Player>({
     x: CANVAS_WIDTH / 2 - 15,
@@ -115,6 +115,7 @@ const GameCanvas: React.FC = () => {
     if (!ctx) return;
 
     let animationFrameId: number;
+    let lastTime = performance.now();
 
     const handleKeyDown = (e: KeyboardEvent) => {
       keys.current[e.key] = true;
@@ -129,11 +130,18 @@ const GameCanvas: React.FC = () => {
     window.addEventListener('keyup', handleKeyUp);
 
     const render = (time: number) => {
+      const deltaTime = (time - lastTime) / 16.67; // Normalize to ~60fps
+      lastTime = time;
+      
+      const dt = Math.min(Math.max(deltaTime, 0.1), 2); // Cap dt to avoid huge jumps or negative time
+
       if (gameState === 'PLAYING') {
         // Smooth horizontal movement using key state or mobile touch
+        const currentMobileMove = useGameStore.getState().mobileMove;
         const speed = TIER_STATS[characterTier].speed;
-        if (keys.current['ArrowLeft'] || mobileMove === 'LEFT') player.current.vx = -speed;
-        else if (keys.current['ArrowRight'] || mobileMove === 'RIGHT') player.current.vx = speed;
+        
+        if (keys.current['ArrowLeft'] || currentMobileMove === 'LEFT') player.current.vx = -speed;
+        else if (keys.current['ArrowRight'] || currentMobileMove === 'RIGHT') player.current.vx = speed;
         else player.current.vx = 0;
 
         player.current.activePowerUps = player.current.activePowerUps.filter(p => time < p.endTime);
@@ -145,10 +153,10 @@ const GameCanvas: React.FC = () => {
           player.current.vy = -14;
         }
 
-        updatePlayerPhysics(player.current);
+        updatePlayerPhysics(player.current, dt);
 
         platforms.current.forEach((platform, index) => {
-          updatePlatformPhysics(platform);
+          updatePlatformPhysics(platform, dt);
 
           if (player.current.vy > 0 && checkCollision(player.current, platform)) {
              if (!hasHelicopter) {
@@ -170,8 +178,8 @@ const GameCanvas: React.FC = () => {
             if (hasMagnet && platform.item.type === 'COIN') {
                const dist = Math.sqrt((player.current.x - worldItemX)**2 + (player.current.y - worldItemY)**2);
                if (dist < 200) {
-                 platform.item.x += (player.current.x - worldItemX) * 0.15;
-                 platform.item.y += (player.current.y - worldItemY) * 0.15;
+                 platform.item.x += (player.current.x - worldItemX) * 0.15 * dt;
+                 platform.item.y += (player.current.y - worldItemY) * 0.15 * dt;
                }
             }
 
@@ -286,7 +294,7 @@ const GameCanvas: React.FC = () => {
       animationFrameId = requestAnimationFrame(render);
     };
 
-    render(0);
+    animationFrameId = requestAnimationFrame(render);
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
