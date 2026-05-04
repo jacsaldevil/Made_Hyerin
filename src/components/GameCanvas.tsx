@@ -321,6 +321,6 @@ const GameCanvas: React.FC = React.memo(() => {
       height={CANVAS_HEIGHT}
     />
   );
-};
+});
 
 export default GameCanvas;
