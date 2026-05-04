@@ -10,11 +10,16 @@ const CHARACTERS = [
 ];
 
 function App() {
-  const { 
-    gameState, setGameState, score, highScore, coins, 
-    characterTier, setCharacterTier, ownedTiers, buyCharacter,
-    setMobileMove
-  } = useGameStore();
+  const gameState = useGameStore(state => state.gameState);
+  const setGameState = useGameStore(state => state.setGameState);
+  const score = useGameStore(state => state.score);
+  const highScore = useGameStore(state => state.highScore);
+  const coins = useGameStore(state => state.coins);
+  const characterTier = useGameStore(state => state.characterTier);
+  const setCharacterTier = useGameStore(state => state.setCharacterTier);
+  const ownedTiers = useGameStore(state => state.ownedTiers);
+  const buyCharacter = useGameStore(state => state.buyCharacter);
+  const setMobileMove = useGameStore(state => state.setMobileMove);
 
   const handleCharacterAction = (char: typeof CHARACTERS[0]) => {
     if (ownedTiers.includes(char.tier)) {

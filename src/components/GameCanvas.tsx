@@ -11,14 +11,19 @@ const CHAR_EMOJIS = {
   3: '🐯'  // Tiger
 };
 
-const GameCanvas: React.FC = () => {
+const GameCanvas: React.FC = React.memo(() => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const { gameState, setScore, addCoins, characterTier, setGameState } = useGameStore();
+  
+  const gameState = useGameStore(state => state.gameState);
+  const setScore = useGameStore(state => state.setScore);
+  const addCoins = useGameStore(state => state.addCoins);
+  const characterTier = useGameStore(state => state.characterTier);
+  const setGameState = useGameStore(state => state.setGameState);
   
   const player = useRef<Player>({
     x: CANVAS_WIDTH / 2 - 15,
     y: CANVAS_HEIGHT - 100,
-    width: 40, // Increased size for emoji
+    width: 40,
     height: 40,
     vx: 0,
     vy: 0,
@@ -138,11 +143,20 @@ const GameCanvas: React.FC = () => {
       if (gameState === 'PLAYING') {
         // Smooth horizontal movement using key state or mobile touch
         const currentMobileMove = useGameStore.getState().mobileMove;
-        const speed = TIER_STATS[characterTier].speed;
+        const stats = TIER_STATS[characterTier];
+        const maxSpeed = stats.speed;
         
-        if (keys.current['ArrowLeft'] || currentMobileMove === 'LEFT') player.current.vx = -speed;
-        else if (keys.current['ArrowRight'] || currentMobileMove === 'RIGHT') player.current.vx = speed;
-        else player.current.vx = 0;
+        let targetVx = 0;
+        if (keys.current['ArrowLeft'] || currentMobileMove === 'LEFT') targetVx = -maxSpeed;
+        else if (keys.current['ArrowRight'] || currentMobileMove === 'RIGHT') targetVx = maxSpeed;
+
+        // Acceleration and friction
+        const accel = 0.8 * dt;
+        if (player.current.vx < targetVx) {
+          player.current.vx = Math.min(player.current.vx + accel, targetVx);
+        } else if (player.current.vx > targetVx) {
+          player.current.vx = Math.max(player.current.vx - accel, targetVx);
+        }
 
         player.current.activePowerUps = player.current.activePowerUps.filter(p => time < p.endTime);
         
@@ -248,10 +262,7 @@ const GameCanvas: React.FC = () => {
       // Draw Platforms
       platforms.current.forEach(p => {
         ctx.fillStyle = p.type === 'SPRING' ? '#ffcc00' : p.type === 'CRACKED' ? '#996633' : '#44aa44';
-        ctx.shadowBlur = 10;
-        ctx.shadowColor = 'rgba(0,0,0,0.3)';
         ctx.fillRect(p.x, p.y, p.width, p.height);
-        ctx.shadowBlur = 0;
 
         if (p.item && !p.item.collected) {
           ctx.font = '28px Arial'; // Increased item size
